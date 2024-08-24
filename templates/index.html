@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados del Análisis de Sentimientos</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            padding: 20px;
+        }
+        .container-fluid {
+            max-width: 90%;
+        }
+        .table-container {
+            width: 60%;
+            float: left;
+            padding-right: 20px;
+        }
+        .chart-container {
+            width: 35%;
+            float: right;
+            text-align: center;
+        }
+        .chart-container img {
+            max-width: 100%;
+        }
+        .explanation {
+            margin-top: 20px;
+            text-align: justify;
+        }
+        .review-preview {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 250px; /* Ajusta el ancho según sea necesario */
+            cursor: pointer;
+        }
+        .review-full {
+            display: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <h2 class="text-center">Resultados del Análisis de Sentimientos</h2>
+        <div class="table-container">
+            <table class="table table-striped" id="results-table">
+                <thead>
+                    <tr>
+                        <th>Nombre del Producto</th>
+                        <th>Fecha de la Reseña</th>
+                        <th>Reseña</th>
+                        <th>Valoración</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for index, row in df.iterrows() %}
+                    <tr>
+                        <td>{{ row['Nombre del Producto'] }}</td>
+                        <td>{{ row['Fecha de la Reseña'] }}</td>
+                        <td>
+                            <div class="review-preview" style="cursor: pointer;">{{ row['Reseña'][:100] }}...</div>
+                            <div class="review-full" style="display:none; cursor: pointer;">{{ row['Reseña'] }}</div>
+                        </td>
+                        <td>{{ row['Valoración'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="chart-container">
+            <h3>Distribución de Sentimientos</h3>
+            <img src="{{ url_for('static', filename='sentimientos.png') }}" alt="Distribución de Sentimientos">
+            <p class="explanation">El gráfico muestra la distribución de sentimientos en las reseñas analizadas. La mayoría de las reseñas son positivas, con una menor proporción de reseñas negativas y neutras.</p>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('table').DataTable({
+                "pagingType": "simple_numbers",
+                "pageLength": 10
+            });
+            
+            // Funcionalidad de "mostrar más"
+            $('.review-preview').on('click', function() {
+                $(this).hide();
+                $(this).next('.review-full').show();
+            });
+
+            $('.review-full').on('click', function() {
+                $(this).hide();
+                $(this).prev('.review-preview').show();
+            });
+        });
+    </script>
+</body>
+</html>
